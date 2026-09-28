@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MC Connect App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; }
+    /* Animasi halus */
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="text-slate-700 pb-20">
+
+  <div id="toast-container" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 w-max max-w-[90vw]"></div>
+
+  <div class="max-w-md mx-auto min-h-screen bg-white shadow-lg overflow-hidden">
+    
+    <header class="bg-blue-600 text-white p-4 sticky top-0 z-40 shadow-md flex justify-between items-center">
+      <div>
+        <h1 class="font-bold text-lg">MC Connect</h1>
+        <p class="text-[10px] font-medium text-blue-100">Smart Auto-Generate System</p>
+      </div>
+    </header>
+
+    <main class="p-4 space-y-5">
+      
+      <!-- 1. KATEGORI -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-xs font-bold text-slate-600 mb-2">1. PILIH KATEGORI ACARA</label>
+        <select id="kategori" class="w-full border border-slate-300 bg-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500" onchange="toggleForm()">
+          <option value="">-- Pilih Jenis Acara --</option>
+          <option value="Lamaran">Lamaran</option>
+          <option value="Resepsi">Resepsi Saja</option>
+          <option value="Akad & Resepsi">Akad & Resepsi</option>
+        </select>
+        
+        <button id="btnCopyTemplate" onclick="copyTemplateWA()" class="hidden w-full bg-white border border-blue-600 text-blue-600 py-2.5 rounded-lg font-bold mt-3 text-xs shadow-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+          <span>📋</span> Salin Template WA untuk Klien
+        </button>
+      </div>
+
+      <!-- 2. IMPORT -->
+      <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl shadow-sm">
+        <h2 class="text-sm font-bold text-blue-800 mb-2">2. 📥 Import Data WhatsApp</h2>
+        <p class="text-[10px] text-blue-600 mb-3">Paste balasan dari klien di sini untuk mengisi form otomatis.</p>
+        <textarea id="importText" rows="3" class="w-full border border-blue-300 bg-white p-3 rounded-lg text-xs outline-none focus:ring-2 focus:ring-blue-500 mb-3" placeholder="Paste chat balasan klien di sini..."></textarea>
+        <button onclick="prosesImportWA()" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold text-xs shadow hover:bg-blue-700 transition-colors">
+          ⬇️ Ekstrak & Isi Form Otomatis
+        </button>
+      </div>
+
+      <!-- 3. DETAIL ACARA -->
+      <div id="form-body" class="hidden space-y-4 fade-in">
+        
+        <div class="border border-slate-200 p-4 rounded-xl bg-white shadow-sm space-y-3">
+          <h2 class="text-sm font-bold text-slate-800 border-b pb-2">3. 📅 Detail Acara (Hasil Ekstrak)</h2>
+          
+          <div id="field-lamaran" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Tanggal & Jam Mulai</label>
+            <input type="text" id="waktuLamaran" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+
+          <div id="field-akad" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Tanggal & Jam Ijab Qobul</label>
+            <input type="text" id="waktuAkad" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Lokasi Akad Nikah</label>
+            <input type="text" id="lokasiAkad" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+
+          <div id="field-resepsi" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Tanggal & Jam Mulai Resepsi</label>
+            <input type="text" id="waktuResepsi" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+
+          <div id="field-disandingkan" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Akad Disandingkan?</label>
+            <select id="akadDisandingkan" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="Ya">Ya</option>
+              <option value="Tidak">Tidak</option>
+            </select>
+          </div>
+
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mt-3">Lokasi Acara (Utama)</label>
+          <input type="text" id="lokasiUtama" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500 uppercase">Link Google Maps</label>
+          <input type="text" id="mapsUrl" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+
+          <label class="block text-[10px] font-bold text-slate-500 uppercase">Nomor WA Klien (Utk Tagihan)</label>
+          <input type="tel" id="waKlien" placeholder="628..." class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div class="border border-pink-200 p-4 rounded-xl bg-pink-50/30 space-y-3 shadow-sm">
+          <h2 class="text-sm font-bold text-pink-700 border-b border-pink-200 pb-2">👰 Data Mempelai Wanita (CPW)</h2>
+          <label class="block text-[10px] font-bold text-slate-500">Nama Lengkap</label>
+          <input type="text" id="namaCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Instagram</label>
+          <input type="text" id="igCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Nama Ibu CPW</label>
+          <input type="text" id="ibuCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Status Ayah CPW</label>
+          <select id="statusAyahCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none" onchange="toggleWali()">
+            <option value="Hidup">Masih Hidup</option>
+            <option value="Almarhum">Almarhum</option>
+          </select>
+          
+          <label class="block text-[10px] font-bold text-slate-500">Nama Ayah CPW</label>
+          <input type="text" id="ayahCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <div id="wali-section" class="hidden bg-red-50 p-3 rounded-lg border border-red-200 mt-2">
+            <label class="block text-[10px] font-bold text-red-600 mb-1">WALI NIKAH (AYAH ALMARHUM)</label>
+            <input type="text" id="namaWali" class="w-full border border-red-300 p-2 rounded-lg text-sm outline-none">
+          </div>
+
+          <label class="block text-[10px] font-bold text-slate-500">Kakak CPW</label>
+          <textarea id="kakakCpw" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          
+          <label class="block text-[10px] font-bold text-slate-500">Adik CPW</label>
+          <textarea id="adikCpw" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+        </div>
+
+        <div class="border border-blue-200 p-4 rounded-xl bg-blue-50/30 space-y-3 shadow-sm">
+          <h2 class="text-sm font-bold text-blue-700 border-b border-blue-200 pb-2">🤵 Data Mempelai Pria (CPP)</h2>
+          <label class="block text-[10px] font-bold text-slate-500">Nama Lengkap</label>
+          <input type="text" id="namaCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Instagram</label>
+          <input type="text" id="igCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Nama Ibu CPP</label>
+          <input type="text" id="ibuCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Status Ayah CPP</label>
+          <select id="statusAyahCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+            <option value="Hidup">Masih Hidup</option>
+            <option value="Almarhum">Almarhum</option>
+          </select>
+          
+          <label class="block text-[10px] font-bold text-slate-500">Nama Ayah CPP</label>
+          <input type="text" id="ayahCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <label class="block text-[10px] font-bold text-slate-500">Kakak CPP</label>
+          <textarea id="kakakCpp" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          
+          <label class="block text-[10px] font-bold text-slate-500">Adik CPP</label>
+          <textarea id="adikCpp" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+        </div>
+
+        <div class="border border-emerald-200 p-4 rounded-xl bg-emerald-50/30 space-y-3 shadow-sm">
+          <h2 class="text-sm font-bold text-emerald-800 border-b border-emerald-200 pb-2">🎤 Partisipan Acara</h2>
+          
+          <div id="partisipan-sambutan" class="space-y-3">
+            <label class="block text-[10px] font-bold text-slate-500">Sambutan Pihak CPW</label>
+            <input type="text" id="sambutanCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+            
+            <label class="block text-[10px] font-bold text-slate-500">Sambutan Pihak CPP</label>
+            <input type="text" id="sambutanCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          </div>
+          
+          <label class="block text-[10px] font-bold text-slate-500 mt-3" id="label-doa">Pembaca Doa / Qori</label>
+          <input type="text" id="doaQori" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          
+          <div id="partisipan-akad" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500">Saksi CPW</label>
+            <input type="text" id="saksiCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+            
+            <label class="block text-[10px] font-bold text-slate-500">Saksi CPP</label>
+            <input type="text" id="saksiCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+            
+            <label class="block text-[10px] font-bold text-slate-500">KUA Kecamatan</label>
+            <input type="text" id="kua" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+            
+            <label class="block text-[10px] font-bold text-slate-500">Petugas KUA / Penghulu</label>
+            <input type="text" id="penghulu" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          </div>
+
+          <label class="block text-[10px] font-bold text-slate-500 mt-3">Tamu Kehormatan</label>
+          <textarea id="tamuKehormatan" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          
+          <label class="block text-[10px] font-bold text-slate-500">Speech Keluarga/Sahabat</label>
+          <textarea id="speechSahabat" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          
+          <div id="list-foto-section" class="hidden mt-3">
+            <label class="block text-[10px] font-bold text-slate-500">List Foto</label>
+            <textarea id="listFoto" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          </div>
+          
+          <div id="pendamping-cpw-section" class="hidden mt-3">
+            <label class="block text-[10px] font-bold text-slate-500">Pendamping CPW</label>
+            <textarea id="pendampingCpw" rows="2" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none"></textarea>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 p-4 rounded-xl bg-white shadow-sm space-y-3">
+          <h2 class="text-sm font-bold text-slate-800 border-b pb-2 flex justify-between items-center">
+            🤝 Daftar Vendor
+            <button onclick="addVendor()" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-1 rounded hover:bg-slate-300">+ Tambah</button>
+          </h2>
+          <div id="vendor-container" class="space-y-3">
+            <div class="flex gap-2"><input type="text" value="WO" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-wo" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="WO"></div>
+            <div class="flex gap-2"><input type="text" value="Decor/Backdrop" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-decor" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Decor/Backdrop"></div>
+            <div class="flex gap-2"><input type="text" value="MUA" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-mua" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="MUA/Attire"></div>
+            <div class="flex gap-2"><input type="text" value="Venue" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-venue" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Venue"></div>
+            <div class="flex gap-2"><input type="text" value="FG/VG" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-foto" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="FG/VG"></div>
+            <div class="flex gap-2"><input type="text" value="Sound" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-sound" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Entertaint/Sound"></div>
+            <div id="vendor-seserahan" class="hidden flex gap-2"><input type="text" value="Seserahan" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-seserahan" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Seserahan"></div>
+            <div id="vendor-catering" class="hidden flex gap-2"><input type="text" value="Catering" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-catering" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Catering"></div>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 p-4 rounded-xl bg-slate-50 shadow-sm space-y-3">
+          <h2 class="text-sm font-bold text-slate-800 border-b pb-2">💰 Keuangan (Otomatis)</h2>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase">Total Harga (Rp)</label>
+          <input type="number" id="harga" placeholder="0" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-[10px] font-bold text-slate-500 uppercase">Sudah DP (Rp)</label>
+          <input type="number" id="dp" placeholder="0" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <button onclick="simpanData()" class="w-full bg-slate-800 text-white p-4 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition-colors">
+          💾 Simpan Data Klien
+        </button>
+
+      </div>
+    </main>
+
+    <div class="bg-slate-100 min-h-[400px] p-4 border-t border-slate-200">
+      <h2 class="font-bold text-slate-800 mb-4">🗂 Database Klien</h2>
+      <div id="listKlien" class="space-y-4">
+        <p class="text-xs text-slate-500 text-center py-4" id="emptyState">Belum ada data.</p>
+      </div>
+    </div>
+
+    <!-- Modal Document Cetak -->
+    <div id="modalDoc" class="hidden fixed inset-0 w-full h-full bg-slate-900/60 z-50 flex flex-col justify-end">
+      <div class="bg-white w-full h-[90vh] rounded-t-2xl shadow-2xl flex flex-col">
+        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+          <h3 class="font-bold text-slate-800">📄 Pratinjau Cue Card</h3>
+          <button onclick="closeModal()" class="w-8 h-8 bg-slate-200 rounded-full text-slate-600 font-bold hover:bg-red-500 hover:text-white transition-colors">&times;</button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-4 bg-slate-300">
+          <div id="documentPaper" contenteditable="true" class="bg-white p-6 shadow-md mx-auto max-w-full text-[13px] font-serif leading-relaxed text-black min-h-full outline-none focus:ring-2 focus:ring-blue-500">
+            <!-- Isi dokumen dirender di sini -->
+          </div>
+        </div>
+        
+        <div class="p-4 border-t border-slate-200 bg-white grid grid-cols-2 gap-3">
+          <button onclick="exportDoc('A4')" class="bg-blue-100 text-blue-700 py-3 rounded-lg font-bold border border-blue-200 text-xs hover:bg-blue-200">
+            📥 Cetak Kertas (A4)
+          </button>
+          <button onclick="exportDoc('A5')" class="bg-blue-600 text-white py-3 rounded-lg font-bold text-xs shadow-md hover:bg-blue-700">
+            📥 Cetak Cue Card (A5)
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let database = [];
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-blue-600';
+      toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 transform transition-all duration-300 translate-y-10 opacity-0`;
+      toast.innerHTML = type === 'success' ? `✅ <span>${message}</span>` : `📌 <span>${message}</span>`;
+      container.appendChild(toast);
+      
+      setTimeout(() => toast.classList.remove('translate-y-10', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('translate-y-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    const templates = {
+      'Lamaran': `FORM LAMARAN\n*Wajib Diisi*\n\n- Tanggal & Jam Mulai (Cth = Minggu, 23 Feb 2026, Pukul 10.00):\n- Lokasi Acara (Cth = Gedung A / Rumah Ibu Budi):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Siti):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Budi):\n- Nama Kakak CPW (Pisahkan koma, Cth = Andi, Rani):\n- Nama Adik CPW (Pisahkan koma, Cth = Toni):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji Asmoro):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Ani):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Joko):\n- Nama Kakak CPP (Pisahkan koma, Cth = Dina):\n- Nama Adik CPP (Pisahkan koma, Cth = Rendi):\n\n*PARTISIPAN*\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Pembacaan Doa (Cth = Ustadz Somad):\n- Tamu Kehormatan (Cth = Bapak Bupati, H. Lulung):\n- Pendamping CPW (Cth = Rina, Sari):\n- Speech Sahabat (Cth = Riska):\n\n*VENDOR*\n- WO (Cth = ABC Organizer):\n- Decor/Backdrop (Cth = XYZ Decor):\n- MUA (Cth = Rini Make Up):\n- Venue (Cth = Gedung A):\n- FG/VG (Cth = Story Pictures):\n- Sound (Cth = JKL Audio):`,
+      
+      'Resepsi': `FORM RESEPSI\n*Wajib Diisi*\n\n- Tanggal & Jam Akad Nikah (Lalu) (Cth = Minggu, 7 Sep 2025, 08.00):\n- Lokasi Akad Nikah (Cth = Masjid Annadzom):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 12 Sep 2026, 11.00):\n- Lokasi Resepsi (Cth = Kediaman Bpk Ruslan):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n- Akad Tercatat di KUA Kec (Cth = KUA Kebayoran):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Irma Wati):\n- Instagram CPW (Cth = @IrmaW):\n- Nama Ibu CPW (Cth = Ibu Nunung):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Rohadi):\n- Nama Kakak CPW (Pisahkan koma):\n- Nama Adik CPW (Pisahkan koma):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Muhamad Fajar):\n- Instagram CPP (Cth = @FajarF):\n- Nama Ibu CPP (Cth = Ibu Supiah):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Ruslan):\n- Nama Kakak CPP (Pisahkan koma):\n- Nama Adik CPP (Pisahkan koma, Cth = Irwan):\n\n*PARTISIPAN*\n- Doa Pembuka (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Speech Sahabat (Cth = Riska):\n- Tamu Kehormatan (Cth = Bapak Lurah):\n- List Foto (Cth = Keluarga Inti CPW, Keluarga CPP):\n\n*VENDOR*\n- WO (Cth = DEF Organizer):\n- Decor/Backdrop (Cth = Alima Decoration):\n- MUA (Cth = Fianna Makeup):\n- Venue (Cth = Gedung B):\n- FG/VG (Cth = Potret Wedding):\n- Sound (Cth = Gambus Elhasbi):`,
+      
+      'Akad & Resepsi': `FORM AKAD & RESEPSI\n*Wajib Diisi*\n\n- Akad Disandingkan (Ya/Tidak):\n- Tanggal & Jam Ijab Qobul (Cth = Sabtu, 3 Jan 2026, 08.00):\n- Lokasi Acara (Cth = Gedung C):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 3 Jan 2026, 11.00):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Slamet Riyani):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Dedi):\n- Nama Kakak CPW (Pisahkan koma):\n- Nama Adik CPW (Pisahkan koma):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Kowiyah):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Bustanul):\n- Nama Kakak CPP (Pisahkan koma):\n- Nama Adik CPP (Pisahkan koma):\n\n*PARTISIPAN*\n- Pembaca Al Quran (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Petugas KUA (Cth = Bapak Budi):\n- KUA Kecamatan (Cth = KUA Kebayoran):\n- Saksi CPW (Cth = Bapak Andi):\n- Saksi CPP (Cth = Bapak Doni):\n- Wali Nikah (Cth = Bapak Budi - Kakak Kandung):\n- Tamu Kehormatan (Cth = Bapak Walikota):\n- List Foto (Cth = Keluarga Inti, VIP):\n\n*VENDOR*\n- WO (Cth = GHI Organizer):\n- Decor/Backdrop (Cth = JKL Decor):\n- MUA (Cth = MNO Makeup):\n- Venue (Cth = Gedung C):\n- FG/VG (Cth = PQR Pictures):\n- Sound (Cth = STU Audio):\n- Seserahan (Cth = VWX Craft):\n- Catering (Cth = YZ Catering):`
+    };
+
+    function toggleForm() {
+      const cat = document.getElementById('kategori').value;
+      const form = document.getElementById('form-body');
+      const btnWA = document.getElementById('btnCopyTemplate');
+      
+      ['field-lamaran', 'field-akad', 'field-resepsi', 'field-disandingkan', 'partisipan-akad', 'list-foto-section', 'pendamping-cpw-section', 'vendor-seserahan', 'vendor-catering'].forEach(id => document.getElementById(id).classList.add('hidden'));
+
+      if (!cat) {
+        form.classList.add('hidden');
+        btnWA.classList.add('hidden');
+        return;
+      }
+      
+      form.classList.remove('hidden');
+      btnWA.classList.remove('hidden');
+
+      if (cat === 'Lamaran') {
+        document.getElementById('field-lamaran').classList.remove('hidden');
+        document.getElementById('pendamping-cpw-section').classList.remove('hidden');
+        document.getElementById('label-doa').innerText = 'Pembacaan Doa';
+      } else if (cat === 'Resepsi') {
+        document.getElementById('field-akad').classList.remove('hidden');
+        document.getElementById('field-resepsi').classList.remove('hidden');
+        document.getElementById('list-foto-section').classList.remove('hidden');
+        document.getElementById('label-doa').innerText = 'Doa Pembuka';
+      } else if (cat === 'Akad & Resepsi') {
+        document.getElementById('field-akad').classList.remove('hidden');
+        document.getElementById('field-resepsi').classList.remove('hidden');
+        document.getElementById('field-disandingkan').classList.remove('hidden');
+        document.getElementById('partisipan-akad').classList.remove('hidden');
+        document.getElementById('list-foto-section').classList.remove('hidden');
+        document.getElementById('vendor-seserahan').classList.remove('hidden');
+        document.getElementById('vendor-catering').classList.remove('hidden');
+        document.getElementById('label-doa').innerText = 'Pembaca Al Quran';
+      }
+      toggleWali();
+    }
+
+    function toggleWali() {
+      const cat = document.getElementById('kategori').value;
+      const statusAyah = document.getElementById('statusAyahCpw').value;
+      const waliSection = document.getElementById('wali-section');
+      
+      if (cat === 'Akad & Resepsi' && statusAyah === 'Almarhum') {
+        waliSection.classList.remove('hidden');
+      } else {
+        waliSection.classList.add('hidden');
+      }
+    }
+
+    function addVendor() {
+      const container = document.getElementById('vendor-container');
+      const div = document.createElement('div');
+      div.className = 'flex gap-2 mt-2';
+      div.innerHTML = `
+        <input type="text" placeholder="Jenis Vendor" class="w-1/3 border border-slate-300 p-2 rounded-lg text-sm bg-white custom-vendor-type">
+        <input type="text" placeholder="Nama Vendor" class="w-2/3 border border-slate-300 p-2 rounded-lg text-sm vendor-input custom-vendor-val">
+      `;
+      container.appendChild(div);
+    }
+
+    function copyTemplateWA() {
+      const cat = document.getElementById('kategori').value;
+      const text = templates[cat];
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Template WA disalin! Silakan paste ke chat klien.", "success");
+      }).catch(err => {
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showToast("Template WA disalin! Silakan paste ke chat klien.", "success");
+      });
+    }
+
+    function extract(text, key) {
+      // Membersihkan semua tulisan (Cth = ...) di balik layar agar regex tidak tertipu
+      let cleanedText = text.replace(/\(Cth =.*?\)/gi, '')
+                            .replace(/\[Cth =.*?\]/gi, '')
+                            .replace(/\(Contoh =.*?\)/gi, '')
+                            .replace(/\[Contoh =.*?\]/gi, '')
+                            .replace(/\(Pisahkan koma.*?\)/gi, '')
+                            .replace(/\(Hidup\/Almarhum\)/gi, '')
+                            .replace(/\(Lalu\)/gi, '');
+                            
+      const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      
+      // Update: (?:-\s*)? means allow optional hyphen and space at the beginning
+      // [^:\n\r]*: means read until the FIRST colon on the SAME line. DO NOT jump to the next line.
+      const regex = new RegExp(`^\\s*(?:-\\s*)?${safeKey}[^:\\n\\r]*:(.*)$`, 'im');
+      
+      const match = cleanedText.match(regex);
+      if (match) {
+        let val = match[1].trim();
+        return val;
+      }
+      return '';
+    }
+
+    function prosesImportWA() {
+      const txt = document.getElementById('importText').value;
+      if (!txt) {
+         showToast("Peringatan: Paste balasan klien dulu!", "error");
+         return;
+      }
+      
+      // Map ke Field
+      document.getElementById('lokasiUtama').value = extract(txt, 'Lokasi Acara') || extract(txt, 'Lokasi Resepsi');
+      document.getElementById('mapsUrl').value = extract(txt, 'Link Maps');
+      document.getElementById('waKlien').value = extract(txt, 'Nomor WA Klien');
+      
+      document.getElementById('waktuLamaran').value = extract(txt, 'Tanggal & Jam Mulai');
+      document.getElementById('waktuAkad').value = extract(txt, 'Tanggal & Jam Akad Nikah') || extract(txt, 'Tanggal & Jam Ijab Qobul');
+      document.getElementById('waktuResepsi').value = extract(txt, 'Tanggal & Jam Resepsi') || extract(txt, 'Tanggal & Jam Mulai Resepsi');
+      document.getElementById('lokasiAkad').value = extract(txt, 'Lokasi Akad Nikah');
+
+      const akadDis = extract(txt, 'Akad Disandingkan');
+      if(akadDis.toLowerCase().includes('ya')) document.getElementById('akadDisandingkan').value = 'Ya';
+      else if (akadDis.toLowerCase().includes('tidak')) document.getElementById('akadDisandingkan').value = 'Tidak';
+      
+      document.getElementById('namaCpw').value = extract(txt, 'Nama Lengkap CPW');
+      document.getElementById('igCpw').value = extract(txt, 'Instagram CPW');
+      document.getElementById('ibuCpw').value = extract(txt, 'Nama Ibu CPW');
+      if (extract(txt, 'Status Ayah CPW').toLowerCase().includes('almarhum')) {
+        document.getElementById('statusAyahCpw').value = 'Almarhum';
+      } else { document.getElementById('statusAyahCpw').value = 'Hidup'; }
+      document.getElementById('ayahCpw').value = extract(txt, 'Nama Ayah CPW');
+      document.getElementById('kakakCpw').value = extract(txt, 'Nama Kakak CPW');
+      document.getElementById('adikCpw').value = extract(txt, 'Nama Adik CPW');
+      
+      document.getElementById('namaCpp').value = extract(txt, 'Nama Lengkap CPP');
+      document.getElementById('igCpp').value = extract(txt, 'Instagram CPP');
+      document.getElementById('ibuCpp').value = extract(txt, 'Nama Ibu CPP');
+      if (extract(txt, 'Status Ayah CPP').toLowerCase().includes('almarhum')) {
+        document.getElementById('statusAyahCpp').value = 'Almarhum';
+      } else { document.getElementById('statusAyahCpp').value = 'Hidup'; }
+      document.getElementById('ayahCpp').value = extract(txt, 'Nama Ayah CPP');
+      document.getElementById('kakakCpp').value = extract(txt, 'Nama Kakak CPP');
+      document.getElementById('adikCpp').value = extract(txt, 'Nama Adik CPP');
+
+      document.getElementById('sambutanCpw').value = extract(txt, 'Sambutan Pihak CPW');
+      document.getElementById('sambutanCpp').value = extract(txt, 'Sambutan Pihak CPP');
+      document.getElementById('doaQori').value = extract(txt, 'Pembacaan Doa') || extract(txt, 'Doa Pembuka') || extract(txt, 'Pembaca Al Quran');
+      document.getElementById('tamuKehormatan').value = extract(txt, 'Tamu Kehormatan');
+      document.getElementById('speechSahabat').value = extract(txt, 'Speech Sahabat');
+      document.getElementById('pendampingCpw').value = extract(txt, 'Pendamping CPW');
+      document.getElementById('listFoto').value = extract(txt, 'List Foto');
+      document.getElementById('saksiCpw').value = extract(txt, 'Saksi CPW');
+      document.getElementById('saksiCpp').value = extract(txt, 'Saksi CPP');
+      document.getElementById('kua').value = extract(txt, 'KUA Kecamatan') || extract(txt, 'Akad Tercatat di KUA Kec');
+      document.getElementById('penghulu').value = extract(txt, 'Petugas KUA');
+      document.getElementById('namaWali').value = extract(txt, 'Wali Nikah');
+
+      document.getElementById('v-wo').value = extract(txt, 'WO');
+      document.getElementById('v-decor').value = extract(txt, 'Decor/Backdrop');
+      document.getElementById('v-mua').value = extract(txt, 'MUA');
+      document.getElementById('v-venue').value = extract(txt, 'Venue');
+      document.getElementById('v-foto').value = extract(txt, 'FG/VG');
+      document.getElementById('v-sound').value = extract(txt, 'Sound');
+      document.getElementById('v-seserahan').value = extract(txt, 'Seserahan');
+      document.getElementById('v-catering').value = extract(txt, 'Catering');
+
+      toggleWali();
+      showToast("Berhasil Ekstrak! Cek kolom form di bawah.", "success");
+    }
+
+    function getVal(id) { return document.getElementById(id).value || ''; }
+    
+    function simpanData() {
+      const harga = Number(document.getElementById('harga').value) || 0;
+      const dp = Number(document.getElementById('dp').value) || 0;
+      const kurangBayar = harga - dp;
+      const status = (harga > 0 && kurangBayar <= 0) ? 'LUNAS' : 'BELUM LUNAS';
+
+      let vendors = [];
+      document.querySelectorAll('.vendor-input').forEach(el => {
+        if(el.offsetParent !== null) { 
+           const vName = el.getAttribute('data-vname') || (el.previousElementSibling ? el.previousElementSibling.value : '');
+           if(vName && el.value) vendors.push({ type: vName, name: el.value });
+        }
+      });
+
+      const data = {
+        kategori: getVal('kategori'), waKlien: getVal('waKlien'),
+        waktuLamaran: getVal('waktuLamaran'), waktuAkad: getVal('waktuAkad'), lokasiAkad: getVal('lokasiAkad'),
+        waktuResepsi: getVal('waktuResepsi'), lokasiUtama: getVal('lokasiUtama'), mapsUrl: getVal('mapsUrl'),
+        akadDisandingkan: getVal('akadDisandingkan'),
+        cpw: getVal('namaCpw'), igCpw: getVal('igCpw'), ibuCpw: getVal('ibuCpw'), statusAyahCpw: getVal('statusAyahCpw'), ayahCpw: getVal('ayahCpw'), kakakCpw: getVal('kakakCpw'), adikCpw: getVal('adikCpw'),
+        waliNikah: getVal('statusAyahCpw') === 'Almarhum' ? getVal('namaWali') : getVal('ayahCpw') + ' (Ayah Kandung)',
+        cpp: getVal('namaCpp'), igCpp: getVal('igCpp'), ibuCpp: getVal('ibuCpp'), statusAyahCpp: getVal('statusAyahCpp'), ayahCpp: getVal('ayahCpp'), kakakCpp: getVal('kakakCpp'), adikCpp: getVal('adikCpp'),
+        sambutanCpw: getVal('sambutanCpw'), sambutanCpp: getVal('sambutanCpp'), doaQori: getVal('doaQori'),
+        saksiCpw: getVal('saksiCpw'), saksiCpp: getVal('saksiCpp'), kua: getVal('kua'), penghulu: getVal('penghulu'),
+        tamuKehormatan: getVal('tamuKehormatan'), speechSahabat: getVal('speechSahabat'),
+        pendampingCpw: getVal('pendampingCpw'), listFoto: getVal('listFoto'),
+        vendors: vendors, harga, dp, kurangBayar, status
+      };
+
+      database.unshift(data);
+      
+      const emptyState = document.getElementById('emptyState');
+      if(emptyState) emptyState.remove();
+
+      renderDashboard();
+      showToast("Data Tersimpan di Database!", "success");
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function renderDashboard() {
+      const list = document.getElementById('listKlien');
+      if (database.length === 0) return;
+
+      list.innerHTML = '';
+      database.forEach((d, i) => {
+        const numWA = d.waKlien.replace(/[^0-9]/g, '');
+        const formatUang = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(d.kurangBayar);
+        let linkWA = numWA ? `https://wa.me/${numWA}?text=Halo%20izin%20mengingatkan%20sisa%20tagihan%20Rp${d.kurangBayar}` : '#';
+
+        list.innerHTML += `
+          <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <h3 class="font-bold text-sm">${d.cpw || 'Client'} & ${d.cpp || 'Client'}</h3>
+                <p class="text-[10px] text-blue-600 font-bold">${d.kategori}</p>
+              </div>
+              <span class="text-[9px] px-2 py-1 rounded font-bold ${d.status === 'LUNAS' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">${d.status}</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 mt-3">
+              <button onclick="generateNaskah(${i})" class="bg-slate-100 border border-slate-300 text-slate-700 py-2 rounded-lg text-[11px] font-bold hover:bg-slate-200">
+                📄 Kelola Dokumen
+              </button>
+              ${d.status !== 'LUNAS' && numWA ? `
+                <a href="${linkWA}" target="_blank" class="bg-green-50 border border-green-200 text-green-700 py-2 rounded-lg text-[11px] font-bold text-center flex items-center justify-center hover:bg-green-100">
+                  📲 Tagih WA
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function formatList(text) {
+      if(!text) return '-';
+      return text.split(/,|\n/).map(s => s.trim()).filter(s => s).map(s => `<div>- ${s}</div>`).join('');
+    }
+    function formatListNum(text) {
+      if(!text) return '-';
+      return text.split(/,|\n/).map(s => s.trim()).filter(s => s).map((s, i) => `<div>${i+1}. ${s}</div>`).join('');
+    }
+
+    function generateNaskah(index) {
+      const d = database[index];
+      let paper = document.getElementById('documentPaper');
+      
+      let html = `<div style="text-align:center; margin-bottom: 20px;">`;
+      html += `<h2 style="margin:0; font-size:18px;"><b>DATA ACARA - ${d.kategori.toUpperCase()}</b></h2>`;
+      html += `</div>`;
+
+      // Info Waktu & Lokasi
+      html += `<table style="width:100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px;">`;
+      if(d.kategori === 'Lamaran') {
+        html += `<tr><td style="width:35%;"><b>Jam Mulai</b></td><td>: <b>${d.waktuLamaran}</b></td></tr>`;
+        html += `<tr><td><b>Lokasi</b></td><td>: <b>${d.lokasiUtama}</b></td></tr>`;
+        html += `<tr><td><b>Maps</b></td><td>: ${d.mapsUrl}</td></tr>`;
+      } else if (d.kategori === 'Resepsi') {
+        html += `<tr><td style="width:35%;"><b>Tgl & Jam Ijab Qobul</b></td><td>: <b>${d.waktuAkad}</b></td></tr>`;
+        html += `<tr><td><b>Lokasi Akad</b></td><td>: <b>${d.lokasiAkad}</b></td></tr>`;
+        html += `<tr><td><b>Akad Tercatat KUA</b></td><td>: <b>${d.kua}</b></td></tr>`;
+        html += `<tr><td><b>Tgl & Jam Resepsi</b></td><td>: <b>${d.waktuResepsi}</b></td></tr>`;
+        html += `<tr><td><b>Lokasi Resepsi</b></td><td>: <b>${d.lokasiUtama}</b></td></tr>`;
+      } else {
+        html += `<tr><td style="width:35%;"><b>Akad Disandingkan</b></td><td>: <b>${d.akadDisandingkan}</b></td></tr>`;
+        html += `<tr><td><b>Jam Ijab Qobul</b></td><td>: <b>${d.waktuAkad}</b></td></tr>`;
+        html += `<tr><td><b>Lokasi Acara</b></td><td>: <b>${d.lokasiUtama}</b></td></tr>`;
+        html += `<tr><td><b>Tgl & Jam Resepsi</b></td><td>: <b>${d.waktuResepsi}</b></td></tr>`;
+      }
+      html += `</table><hr style="border-top:1px dashed #000; margin: 15px 0;">`;
+
+      // CPW & CPP Tabel Horizontal
+      html += `<table style="width:100%; border-collapse: collapse; margin-bottom: 15px; font-size: 14px;">
+        <tr>
+          <td style="width:50%; vertical-align: top; padding-right: 15px;">
+            <b>DATA CPW/PW</b><br><br>
+            <b>Nama Lengkap:</b> <b>${d.cpw}</b><br>
+            <b>IG:</b> ${d.igCpw}<br>
+            <b>Ibu:</b> <b>${d.ibuCpw}</b><br>
+            <b>Bapak:</b> <b>${d.ayahCpw} ${d.statusAyahCpw === 'Almarhum' ? '(Alm)' : ''}</b><br><br>
+            <b>Kakak:</b><br>${formatList(d.kakakCpw)}<br>
+            <b>Adik:</b><br>${formatList(d.adikCpw)}
+          </td>
+          <td style="width:50%; vertical-align: top; padding-left: 15px; border-left: 1px solid #000;">
+            <b>DATA CPP/PP</b><br><br>
+            <b>Nama Lengkap:</b> <b>${d.cpp}</b><br>
+            <b>IG:</b> ${d.igCpp}<br>
+            <b>Ibu:</b> <b>${d.ibuCpp}</b><br>
+            <b>Bapak:</b> <b>${d.ayahCpp} ${d.statusAyahCpp === 'Almarhum' ? '(Alm)' : ''}</b><br><br>
+            <b>Kakak:</b><br>${formatList(d.kakakCpp)}<br>
+            <b>Adik:</b><br>${formatList(d.adikCpp)}
+          </td>
+        </tr>
+      </table><hr style="border-top:1px dashed #000; margin: 15px 0;">`;
+
+      // Partisipan
+      html += `<div><b>PARTISIPAN ACARA</b></div>`;
+      html += `<table style="width:100%; font-size: 14px; margin-top:5px; margin-bottom: 15px;">`;
+      if(d.kategori === 'Akad & Resepsi') {
+        html += `<tr><td style="width:40%;">Pembaca Al Quran</td><td>: Bapak <b>${d.doaQori}</b></td></tr>`;
+        html += `<tr><td>Petugas KUA</td><td>: Bapak <b>${d.penghulu}</b></td></tr>`;
+        html += `<tr><td>Wali Nikah</td><td>: Bapak <b>${d.waliNikah}</b></td></tr>`;
+        html += `<tr><td>Saksi CPW</td><td>: Bapak <b>${d.saksiCpw}</b></td></tr>`;
+        html += `<tr><td>Saksi CPP</td><td>: Bapak <b>${d.saksiCpp}</b></td></tr>`;
+      } else {
+        html += `<tr><td style="width:40%;">Doa / Qori</td><td>: Bapak <b>${d.doaQori}</b></td></tr>`;
+      }
+      html += `<tr><td>Sambutan Pihak CPW</td><td>: Bapak <b>${d.sambutanCpw}</b></td></tr>`;
+      html += `<tr><td>Sambutan Pihak CPP</td><td>: Bapak <b>${d.sambutanCpp}</b></td></tr>`;
+      html += `</table>`;
+
+      html += `<div style="font-size:14px; margin-bottom: 10px;"><b>Tamu Kehormatan:</b><br>${formatListNum(d.tamuKehormatan)}</div>`;
+      if(d.kategori === 'Lamaran') html += `<div style="font-size:14px; margin-bottom: 10px;"><b>Pendamping CPW:</b><br>${formatList(d.pendampingCpw)}</div>`;
+      html += `<div style="font-size:14px; margin-bottom: 10px;"><b>Speech Keluarga/Sahabat:</b><br>${formatList(d.speechSahabat)}</div>`;
+      if(d.kategori !== 'Lamaran') html += `<div style="font-size:14px; margin-bottom: 10px;"><b>List Foto:</b><br>${formatList(d.listFoto)}</div>`;
+      
+      html += `<hr style="border-top:1px dashed #000; margin: 15px 0;">`;
+
+      // Vendor
+      html += `<div><b>NAMA VENDOR</b></div>`;
+      html += `<table style="width:100%; font-size: 14px; margin-top:5px;">`;
+      d.vendors.forEach(v => {
+        html += `<tr><td style="width:40%;">- ${v.type}</td><td>: <b>${v.name}</b></td></tr>`;
+      });
+      html += `</table>`;
+
+      // Naskah Khusus
+      html += `<br><br><div style="text-align:center; font-size: 16px;"><b>========================</b></div><br><br>`;
+      if(d.kategori === 'Resepsi') {
+        html += `<div style="font-size: 15px; text-align: justify; line-height: 1.8;">
+          Assalamu'alaikum warahmatullahi wabarakatuh.<br><br>
+          Selamat datang kami ucapkan kepada ananda <b>${d.cpw}</b> selaku mempelai wanita dan ananda <b>${d.cpp}</b> selaku mempelai pria beserta seluruh keluarga besar mempelai wanita yaitu keluarga bapak <b>${d.ayahCpw}</b> dan ibu <b>${d.ibuCpw}</b> di kediaman bapak <b>${d.ayahCpp}</b> dan ibu <b>${d.ibuCpp}</b> selaku kedua orang tua dari mempelai pria dalam acara resepsi pernikahan.<br><br>
+          Ada pertemuan yang menjadi awal dari sebuah cerita, ada cinta yang tumbuh menjadi ikatan, dan ada hari ini yang bukan sekadar tentang sebuah perayaan, tetapi tentang dua hati yang telah memilih untuk berjalan bersama dan dua keluarga yang dipertemukan dalam satu ikatan kasih.<br><br>
+          Dengan penuh rasa syukur, hari ini kita menjadi bagian dari doa agar perjalanan cinta kedua mempelai senantiasa dipenuhi kebahagiaan, keberkahan, ketenangan, dan kesejahteraan.<br><br>
+          (pengalungan bunga)<br><br>
+          Mari kita rayakan cinta, kita eratkan silaturahmi, dan kita iringi langkah kedua mempelai dengan doa-doa terbaik.
+        </div>`;
+      } else if (d.kategori === 'Akad & Resepsi') {
+        html += `<div style="font-size: 15px; text-align: center; line-height: 1.8;">
+          <b>[DOA PASCA IJAB QABUL]</b><br><br>
+          "Allahumma inni as 'aluka khairahâ wa khairamâ jabaltahâ alaih. Wa a 'ûdzubika min syarrihâ wa syarrimâ jabaltahâ alaih."<br><br>
+          "Barakallahu laka wa baraka alaika wa jama'a bainakuma fii khair"<br><br>
+          Artinya: "Semoga Allah memberkahimu, dan memberkahi atasmu, dan semoga Allah menghimpun kamu berdua dalam kebaikan"
+        </div>`;
+      } else {
+        html += `<div style="font-size: 15px; text-align: center; color: #666;">
+          <i>[Naskah standar MC Lamaran digunakan pada bagian ini menyesuaikan layout acara]</i>
+        </div>`;
+      }
+
+      paper.innerHTML = html;
+      document.getElementById('modalDoc').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modalDoc').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function exportDoc(size) {
+      const content = document.getElementById('documentPaper').innerHTML;
+      let pageSettings = size === 'A4' 
+        ? `@page WordSection1 {size: 595.3pt 841.9pt; margin: 72.0pt 72.0pt 72.0pt 72.0pt;}` 
+        : `@page WordSection1 {size: 419.5pt 595.3pt; margin: 40.0pt 40.0pt 40.0pt 40.0pt;}`;
+
+      const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><meta charset='utf-8'><title>Export HTML to Word</title>
+      <style>${pageSettings} div.WordSection1 {page: WordSection1;} body { font-family: 'Times New Roman', serif; } table { width: 100%; border-collapse: collapse; }</style></head><body><div class='WordSection1'>`;
+      const sourceHTML = header + content + "</div></body></html>";
+
+      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+      const fileDownload = document.createElement("a");
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = `Dokumen_${size}.doc`;
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
+      showToast("Unduhan dimulai...", "success");
+    }
+  </script>
+</body>
+</html>
