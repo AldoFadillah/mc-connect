@@ -63,14 +63,17 @@
             <input type="text" id="waktuLamaran" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
 
-          <div id="field-akad" class="hidden space-y-3 mt-3">
+          <div id="field-waktu-akad" class="hidden space-y-3 mt-3">
             <label class="block text-[10px] font-bold text-slate-500 uppercase">Tanggal & Jam Ijab Qobul</label>
             <input type="text" id="waktuAkad" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+
+          <div id="field-lokasi-akad" class="hidden space-y-3 mt-3">
             <label class="block text-[10px] font-bold text-slate-500 uppercase">Lokasi Akad Nikah</label>
             <input type="text" id="lokasiAkad" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
 
-          <div id="field-resepsi" class="hidden space-y-3 mt-3">
+          <div id="field-waktu-resepsi" class="hidden space-y-3 mt-3">
             <label class="block text-[10px] font-bold text-slate-500 uppercase">Tanggal & Jam Mulai Resepsi</label>
             <input type="text" id="waktuResepsi" class="w-full border border-slate-300 p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
@@ -166,18 +169,20 @@
           <label class="block text-[10px] font-bold text-slate-500 mt-3" id="label-doa">Pembaca Doa / Qori</label>
           <input type="text" id="doaQori" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
           
-          <div id="partisipan-akad" class="hidden space-y-3 mt-3">
-            <label class="block text-[10px] font-bold text-slate-500">Saksi CPW</label>
+          <div id="field-saksi-penghulu" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Saksi CPW</label>
             <input type="text" id="saksiCpw" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
             
-            <label class="block text-[10px] font-bold text-slate-500">Saksi CPP</label>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Saksi CPP</label>
             <input type="text" id="saksiCpp" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
             
-            <label class="block text-[10px] font-bold text-slate-500">KUA Kecamatan</label>
-            <input type="text" id="kua" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
-            
-            <label class="block text-[10px] font-bold text-slate-500">Petugas KUA / Penghulu</label>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">Petugas KUA / Penghulu</label>
             <input type="text" id="penghulu" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
+          </div>
+
+          <div id="field-kua" class="hidden space-y-3 mt-3">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase">KUA Kecamatan</label>
+            <input type="text" id="kua" class="w-full border border-slate-300 p-3 rounded-lg text-sm outline-none">
           </div>
 
           <label class="block text-[10px] font-bold text-slate-500 mt-3">Tamu Kehormatan</label>
@@ -203,12 +208,13 @@
             <button onclick="addVendor()" class="text-[10px] bg-slate-200 text-slate-700 px-2 py-1 rounded hover:bg-slate-300">+ Tambah</button>
           </h2>
           <div id="vendor-container" class="space-y-3">
+            <div class="flex gap-2"><input type="text" value="MC" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-mc" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="MC"></div>
             <div class="flex gap-2"><input type="text" value="WO" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-wo" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="WO"></div>
             <div class="flex gap-2"><input type="text" value="Decor/Backdrop" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-decor" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Decor/Backdrop"></div>
             <div class="flex gap-2"><input type="text" value="MUA" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-mua" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="MUA/Attire"></div>
             <div class="flex gap-2"><input type="text" value="Venue" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-venue" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Venue"></div>
             <div class="flex gap-2"><input type="text" value="FG/VG" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-foto" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="FG/VG"></div>
-            <div class="flex gap-2"><input type="text" value="Sound" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-sound" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Entertaint/Sound"></div>
+            <div id="vendor-sound" class="hidden flex gap-2"><input type="text" value="Entertaint/Sound" class="w-1/3 border p-2 rounded-lg text-[11px] font-bold bg-slate-50" readonly><input type="text" id="v-sound" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Entertaint/Sound"></div>
             <div id="vendor-seserahan" class="hidden flex gap-2"><input type="text" value="Seserahan" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-seserahan" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Seserahan"></div>
             <div id="vendor-catering" class="hidden flex gap-2"><input type="text" value="Catering" class="w-1/3 border p-2 rounded-lg text-sm font-bold bg-slate-50" readonly><input type="text" id="v-catering" class="w-2/3 border p-2 rounded-lg text-sm vendor-input" data-vname="Catering"></div>
           </div>
@@ -282,11 +288,11 @@
     }
 
     const templates = {
-      'Lamaran': `FORM LAMARAN\n*Wajib Diisi*\n\n- Tanggal & Jam Mulai (Cth = Minggu, 23 Feb 2026, Pukul 10.00):\n- Lokasi Acara (Cth = Gedung A / Rumah Ibu Budi):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Siti):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Budi):\n- Nama Kakak CPW (Pisahkan koma, Cth = Andi, Rani):\n- Nama Adik CPW (Pisahkan koma, Cth = Toni):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji Asmoro):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Ani):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Joko):\n- Nama Kakak CPP (Pisahkan koma, Cth = Dina):\n- Nama Adik CPP (Pisahkan koma, Cth = Rendi):\n\n*PARTISIPAN*\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Pembacaan Doa (Cth = Ustadz Somad):\n- Tamu Kehormatan (Cth = Bapak Bupati, H. Lulung):\n- Pendamping CPW (Cth = Rina, Sari):\n- Speech Sahabat (Cth = Riska):\n\n*VENDOR*\n- WO (Cth = ABC Organizer):\n- Decor/Backdrop (Cth = XYZ Decor):\n- MUA (Cth = Rini Make Up):\n- Venue (Cth = Gedung A):\n- FG/VG (Cth = Story Pictures):\n- Sound (Cth = JKL Audio):`,
+      'Lamaran': `FORM LAMARAN\n*Wajib Diisi*\n\n- Tanggal & Jam Mulai (Cth = Minggu, 23 Feb 2026, Pukul 10.00):\n- Lokasi Acara (Cth = Gedung A / Rumah Ibu Budi):\n- Link Maps (Cth = maps.app.goo.gl/...):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Siti):\n- Nama Ayah CPW (Cth = Bapak Budi):\n- Nama Kakak CPW (Cth = Andi, Rani):\n- Nama Adik CPW (Cth = Toni):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji Asmoro):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Ani):\n- Nama Ayah CPP (Cth = Bapak Joko):\n- Nama Kakak CPP (Cth = Dina):\n- Nama Adik CPP (Cth = Rendi):\n\n*PARTISIPAN*\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Pembacaan Doa (Cth = Ustadz Somad):\n- Tamu Kehormatan (Cth = Bapak Bupati, H. Lulung):\n- Pendamping CPW (Cth = Rina, Sari):\n- Speech Sahabat (Cth = Riska):\n\n*VENDOR*\n- WO (Cth = ABC Organizer):\n- Decor/Backdrop (Cth = XYZ Decor):\n- MUA (Cth = Rini Make Up):\n- Venue (Cth = Gedung A):\n- FG/VG (Cth = Story Pictures):\n- MC: @Megawijaya_MC`,
       
-      'Resepsi': `FORM RESEPSI\n*Wajib Diisi*\n\n- Tanggal & Jam Akad Nikah (Lalu) (Cth = Minggu, 7 Sep 2025, 08.00):\n- Lokasi Akad Nikah (Cth = Masjid Annadzom):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 12 Sep 2026, 11.00):\n- Lokasi Resepsi (Cth = Kediaman Bpk Ruslan):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n- Akad Tercatat di KUA Kec (Cth = KUA Kebayoran):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Irma Wati):\n- Instagram CPW (Cth = @IrmaW):\n- Nama Ibu CPW (Cth = Ibu Nunung):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Rohadi):\n- Nama Kakak CPW (Pisahkan koma):\n- Nama Adik CPW (Pisahkan koma):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Muhamad Fajar):\n- Instagram CPP (Cth = @FajarF):\n- Nama Ibu CPP (Cth = Ibu Supiah):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Ruslan):\n- Nama Kakak CPP (Pisahkan koma):\n- Nama Adik CPP (Pisahkan koma, Cth = Irwan):\n\n*PARTISIPAN*\n- Doa Pembuka (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Speech Sahabat (Cth = Riska):\n- Tamu Kehormatan (Cth = Bapak Lurah):\n- List Foto (Cth = Keluarga Inti CPW, Keluarga CPP):\n\n*VENDOR*\n- WO (Cth = DEF Organizer):\n- Decor/Backdrop (Cth = Alima Decoration):\n- MUA (Cth = Fianna Makeup):\n- Venue (Cth = Gedung B):\n- FG/VG (Cth = Potret Wedding):\n- Sound (Cth = Gambus Elhasbi):`,
+      'Resepsi': `FORM RESEPSI\n*Wajib Diisi*\n\n- Tanggal & Jam Akad Nikah (Lalu) (Cth = Minggu, 7 Sep 2025, 08.00):\n- Lokasi Akad Nikah (Cth = Masjid Annadzom):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 12 Sep 2026, 11.00):\n- Lokasi Resepsi (Cth = Kediaman Bpk Ruslan):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Akad Tercatat di KUA Kec (Cth = KUA Kebayoran):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Irma Wati):\n- Instagram CPW (Cth = @IrmaW):\n- Nama Ibu CPW (Cth = Ibu Nunung):\n- Nama Ayah CPW (Cth = Bapak Rohadi):\n- Nama Kakak CPW (Cth = Reni, Dini):\n- Nama Adik CPW (Cth = Dika):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Muhamad Fajar):\n- Instagram CPP (Cth = @FajarF):\n- Nama Ibu CPP (Cth = Ibu Supiah):\n- Nama Ayah CPP (Cth = Bapak Ruslan):\n- Nama Kakak CPP (Cth = Rendi):\n- Nama Adik CPP (Cth = Irwan):\n\n*PARTISIPAN*\n- Doa Pembuka (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Speech Sahabat (Cth = Riska):\n- Tamu Kehormatan (Cth = Bapak Lurah):\n- List Foto (Cth = Keluarga Inti CPW, Keluarga CPP):\n\n*VENDOR*\n- WO (Cth = DEF Organizer):\n- Decor/Backdrop (Cth = Alima Decoration):\n- MUA (Cth = Fianna Makeup):\n- Venue (Cth = Gedung B):\n- FG/VG (Cth = Potret Wedding):\n- Entertaint/Sound (Cth = Gambus Elhasbi):\n- MC: @Megawijaya_MC`,
       
-      'Akad & Resepsi': `FORM AKAD & RESEPSI\n*Wajib Diisi*\n\n- Akad Disandingkan (Ya/Tidak):\n- Tanggal & Jam Ijab Qobul (Cth = Sabtu, 3 Jan 2026, 08.00):\n- Lokasi Acara (Cth = Gedung C):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Nomor WA Klien (Cth = 6281234567890):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 3 Jan 2026, 11.00):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Slamet Riyani):\n- Status Ayah CPW (Hidup/Almarhum):\n- Nama Ayah CPW (Cth = Bapak Dedi):\n- Nama Kakak CPW (Pisahkan koma):\n- Nama Adik CPW (Pisahkan koma):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Kowiyah):\n- Status Ayah CPP (Hidup/Almarhum):\n- Nama Ayah CPP (Cth = Bapak Bustanul):\n- Nama Kakak CPP (Pisahkan koma):\n- Nama Adik CPP (Pisahkan koma):\n\n*PARTISIPAN*\n- Pembaca Al Quran (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Petugas KUA (Cth = Bapak Budi):\n- KUA Kecamatan (Cth = KUA Kebayoran):\n- Saksi CPW (Cth = Bapak Andi):\n- Saksi CPP (Cth = Bapak Doni):\n- Wali Nikah (Cth = Bapak Budi - Kakak Kandung):\n- Tamu Kehormatan (Cth = Bapak Walikota):\n- List Foto (Cth = Keluarga Inti, VIP):\n\n*VENDOR*\n- WO (Cth = GHI Organizer):\n- Decor/Backdrop (Cth = JKL Decor):\n- MUA (Cth = MNO Makeup):\n- Venue (Cth = Gedung C):\n- FG/VG (Cth = PQR Pictures):\n- Sound (Cth = STU Audio):\n- Seserahan (Cth = VWX Craft):\n- Catering (Cth = YZ Catering):`
+      'Akad & Resepsi': `FORM AKAD & RESEPSI\n*Wajib Diisi*\n\n- Akad Disandingkan (Ya/Tidak) (Cth = Ya):\n- Tanggal & Jam Ijab Qobul (Cth = Sabtu, 3 Jan 2026, 08.00):\n- Lokasi Acara (Cth = Gedung C):\n- Link Maps (Cth = maps.app.goo.gl/...):\n- Tanggal & Jam Resepsi (Cth = Sabtu, 3 Jan 2026, 11.00):\n\n*DATA CPW*\n- Nama Lengkap CPW (Cth = Sasi Nuraes):\n- Instagram CPW (Cth = @SasiNuraes):\n- Nama Ibu CPW (Cth = Ibu Slamet Riyani):\n- Nama Ayah CPW (Cth = Bapak Dedi):\n- Nama Kakak CPW (Cth = Andi):\n- Nama Adik CPW (Cth = Budi):\n\n*DATA CPP*\n- Nama Lengkap CPP (Cth = Galang Aji):\n- Instagram CPP (Cth = @GalangAji):\n- Nama Ibu CPP (Cth = Ibu Kowiyah):\n- Nama Ayah CPP (Cth = Bapak Bustanul):\n- Nama Kakak CPP (Cth = Rendi):\n- Nama Adik CPP (Cth = Dika):\n\n*PARTISIPAN*\n- Pembaca Al Quran (Cth = Ustadz Somad):\n- Sambutan Pihak CPW (Cth = Bapak Heru):\n- Sambutan Pihak CPP (Cth = Bapak Santoso):\n- Petugas KUA (Cth = Bapak Budi):\n- KUA Kecamatan (Cth = KUA Kebayoran):\n- Saksi CPW (Cth = Bapak Andi):\n- Saksi CPP (Cth = Bapak Doni):\n- Wali Nikah (Cth = Bapak Budi - Kakak Kandung):\n- Tamu Kehormatan (Cth = Bapak Walikota):\n- List Foto (Cth = Keluarga Inti, VIP):\n\n*VENDOR*\n- WO (Cth = GHI Organizer):\n- Decor/Backdrop (Cth = JKL Decor):\n- MUA (Cth = MNO Makeup):\n- Venue (Cth = Gedung C):\n- FG/VG (Cth = PQR Pictures):\n- Entertaint/Sound (Cth = STU Audio):\n- Seserahan (Cth = VWX Craft):\n- Catering (Cth = YZ Catering):\n- MC: @Megawijaya_MC`
     };
 
     function toggleForm() {
@@ -294,7 +300,16 @@
       const form = document.getElementById('form-body');
       const btnWA = document.getElementById('btnCopyTemplate');
       
-      ['field-lamaran', 'field-akad', 'field-resepsi', 'field-disandingkan', 'partisipan-akad', 'list-foto-section', 'pendamping-cpw-section', 'vendor-seserahan', 'vendor-catering'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      const dynamicFields = [
+        'field-lamaran', 'field-waktu-akad', 'field-lokasi-akad', 'field-waktu-resepsi', 'field-disandingkan', 
+        'field-kua', 'field-saksi-penghulu', 'list-foto-section', 'pendamping-cpw-section', 
+        'vendor-sound', 'vendor-seserahan', 'vendor-catering'
+      ];
+      
+      dynamicFields.forEach(id => {
+         const el = document.getElementById(id);
+         if(el) el.classList.add('hidden');
+      });
 
       if (!cat) {
         form.classList.add('hidden');
@@ -310,16 +325,21 @@
         document.getElementById('pendamping-cpw-section').classList.remove('hidden');
         document.getElementById('label-doa').innerText = 'Pembacaan Doa';
       } else if (cat === 'Resepsi') {
-        document.getElementById('field-akad').classList.remove('hidden');
-        document.getElementById('field-resepsi').classList.remove('hidden');
+        document.getElementById('field-waktu-akad').classList.remove('hidden');
+        document.getElementById('field-lokasi-akad').classList.remove('hidden');
+        document.getElementById('field-waktu-resepsi').classList.remove('hidden');
+        document.getElementById('field-kua').classList.remove('hidden');
         document.getElementById('list-foto-section').classList.remove('hidden');
+        document.getElementById('vendor-sound').classList.remove('hidden');
         document.getElementById('label-doa').innerText = 'Doa Pembuka';
       } else if (cat === 'Akad & Resepsi') {
-        document.getElementById('field-akad').classList.remove('hidden');
-        document.getElementById('field-resepsi').classList.remove('hidden');
+        document.getElementById('field-waktu-akad').classList.remove('hidden');
+        document.getElementById('field-waktu-resepsi').classList.remove('hidden');
         document.getElementById('field-disandingkan').classList.remove('hidden');
-        document.getElementById('partisipan-akad').classList.remove('hidden');
+        document.getElementById('field-saksi-penghulu').classList.remove('hidden');
+        document.getElementById('field-kua').classList.remove('hidden');
         document.getElementById('list-foto-section').classList.remove('hidden');
+        document.getElementById('vendor-sound').classList.remove('hidden');
         document.getElementById('vendor-seserahan').classList.remove('hidden');
         document.getElementById('vendor-catering').classList.remove('hidden');
         document.getElementById('label-doa').innerText = 'Pembaca Al Quran';
@@ -444,12 +464,13 @@
       document.getElementById('penghulu').value = extract(txt, 'Petugas KUA');
       document.getElementById('namaWali').value = extract(txt, 'Wali Nikah');
 
+      document.getElementById('v-mc').value = extract(txt, 'MC');
       document.getElementById('v-wo').value = extract(txt, 'WO');
       document.getElementById('v-decor').value = extract(txt, 'Decor/Backdrop');
       document.getElementById('v-mua').value = extract(txt, 'MUA');
       document.getElementById('v-venue').value = extract(txt, 'Venue');
       document.getElementById('v-foto').value = extract(txt, 'FG/VG');
-      document.getElementById('v-sound').value = extract(txt, 'Sound');
+      document.getElementById('v-sound').value = extract(txt, 'Entertaint/Sound') || extract(txt, 'Sound');
       document.getElementById('v-seserahan').value = extract(txt, 'Seserahan');
       document.getElementById('v-catering').value = extract(txt, 'Catering');
 
